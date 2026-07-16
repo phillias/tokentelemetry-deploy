@@ -21,7 +21,7 @@ chmod +x setup.sh
 
 Then point your reverse proxy at `127.0.0.1:3011`.
 
-## The two gotchas
+## The four gotchas
 
 ### 1. NEXT_PUBLIC_API_BASE must be baked in at build time
 
@@ -46,11 +46,34 @@ pkill -f "next-server"
 
 The `manage.sh` handles this in its `stop` and `restart` commands.
 
+### 3. Empty NEXT_PUBLIC_API_BASE is treated as unset (upstream bug)
+
+The upstream `api.ts` uses `if (explicit) return explicit` — empty string `""` is falsy in JS, so it falls through to `hostname:8000`. The browser tries to hit port 8000 directly, which fails behind a reverse proxy.
+
+The `setup.sh` patches this to `if (explicit !== undefined && explicit !== null) return explicit` before building. If you rebuild manually:
+
+```bash
+cd ~/tokentelemetry/frontend
+sed -i 's/if (explicit) return explicit;/if (explicit !== undefined \&\& explicit !== null) return explicit;/' src/lib/api.ts
+NEXT_PUBLIC_API_BASE="" npx next build
+```
+
+### 4. Backend requires Python 3.9+
+
+The backend uses `asyncio.to_thread` which was added in Python 3.9. On Ubuntu 20.04 (Python 3.8), the sessions scan fails with `AttributeError: module 'asyncio' has no attribute 'to_thread'`.
+
+The `setup.sh` warns if Python < 3.9 is detected. If you hit this, either upgrade Python or patch `main.py`:
+
+```bash
+cd ~/tokentelemetry/backend
+sed -i 's/data = await _asyncio.to_thread(_scan_sessions_sync)/loop = _asyncio.get_event_loop();\n            data = await loop.run_in_executor(None, _scan_sessions_sync)/' main.py
+```
+
 ## Ports
 
 | Service    | Port | Bind    | Notes                           |
 |------------|------|---------|---------------------------------|
-| Backend    | 8000 | 127.0.0.1 | FastAPI (uvicorn)             |
+| Backend    | 8010 | 127.0.0.1 | FastAPI (uvicorn) — changed from 8000 to avoid conflicts |
 | Frontend   | 3010 | 127.0.0.1 | Next.js production server     |
 | Proxy      | 3011 | 0.0.0.0   | Routes API→backend, rest→frontend |
 

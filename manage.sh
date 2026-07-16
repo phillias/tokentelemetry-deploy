@@ -20,7 +20,7 @@ case "${1:-help}" in
 
     # Backend (FastAPI + uvicorn)
     (cd "$TT_DIR/backend" && setsid -f "$TT_DIR/backend/venv/bin/uvicorn" \
-      main:app --host 127.0.0.1 --port 8000) >> "$LOG/backend.log" 2>&1
+      main:app --host 127.0.0.1 --port 8010) >> "$LOG/backend.log" 2>&1
     sleep 2
 
     # Frontend (Next.js production)
@@ -39,14 +39,14 @@ case "${1:-help}" in
     fi
     sleep 1
 
-    echo "Backend:  $(curl -s -o /dev/null -w OK http://127.0.0.1:8000/agents 2>/dev/null || echo DOWN)"
+    echo "Backend:  $(curl -s -o /dev/null -w OK http://127.0.0.1:8010/agents 2>/dev/null || echo DOWN)"
     echo "Frontend: $(curl -s -o /dev/null -w OK http://127.0.0.1:3010 2>/dev/null || echo DOWN)"
     echo "Proxy:    $(curl -s -o /dev/null -w OK http://127.0.0.1:3011/agents 2>/dev/null || echo DOWN)"
     ;;
 
   stop)
     echo "Stopping TokenTelemetry..."
-    kill_service 8000 "uvicorn main:app"
+    kill_service 8010 "uvicorn main:app"
     kill_service 3010 "next-server"
     kill_service 3011 "proxy.js"
     sleep 1
@@ -60,7 +60,7 @@ case "${1:-help}" in
     ;;
 
   status)
-    echo "Backend:  $(curl -s -o /dev/null -w OK http://127.0.0.1:8000/agents 2>/dev/null || echo DOWN)"
+    echo "Backend:  $(curl -s -o /dev/null -w OK http://127.0.0.1:8010/agents 2>/dev/null || echo DOWN)"
     echo "Frontend: $(curl -s -o /dev/null -w OK http://127.0.0.1:3010 2>/dev/null || echo DOWN)"
     echo "Proxy:    $(curl -s -o /dev/null -w OK http://127.0.0.1:3011/agents 2>/dev/null || echo DOWN)"
     ;;
