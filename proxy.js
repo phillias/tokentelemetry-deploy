@@ -4,7 +4,7 @@
 
 const http = require('http');
 
-const BACKEND  = { host: '127.0.0.1', port: 8000 };
+const BACKEND  = { host: '127.0.0.1', port: 8010 };
 const FRONTEND = { host: '127.0.0.1', port: 3010 };
 const PORT = parseInt(process.env.PROXY_PORT || '3011', 10);
 
