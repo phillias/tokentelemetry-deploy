@@ -22,6 +22,9 @@ const BACKEND_PATHS = [
   '/dashboard',
   '/config/',      // ← frontend calls /config/billing, /config/summarizer, etc.
   '/pricing',
+  '/quotas',       # quota dashboard endpoint
+  '/notifications', # notification bell endpoint
+  '/telemetry/',    # telemetry/event beacon
 ];
 
 // Paths that are always frontend static assets.
