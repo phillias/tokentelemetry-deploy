@@ -1,0 +1,38 @@
+name: Feature request
+description: Propose a new capability or improvement
+title: "[feat]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should be built, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: How will we know the work is complete?
+    validations:
+      required: true
+  - type: dropdown
+    id: delivery
+    attributes:
+      label: Delivery mode
+      description: How should this work be delivered?
+      options:
+        - Direct PR
+        - Supervised task
+        - Undecided
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: reversion
+    attributes:
+      label: Reversion actions
+      description: How to roll back or mitigate if the change causes harm?
+    validations:
+      required: true
